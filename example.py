@@ -17,45 +17,21 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
+from machine import Timer, Pin
+from picosbus import PicoSBUS
 
-import pyb
-from receiver.sbus_receiver import SBUSReceiver
+# Init the SBUS driver using UART 1 and PIN 9 
+sbus = PicoSBUS(1,9)
 
+# Init LED on board
+led = Pin(25, Pin.OUT)
 
-def update_rx_data(timRx):
-    global update_rx
-    update_rx = True
-
-
-def status_led(tim1):
-    global updateLed
-    updateLed = True
-    led.toggle()
-
-updateLed = False
-update_rx = False
-led = pyb.LED(4)
-
-# Init the SBUS driver on UART port 3
-sbus = SBUSReceiver(3)
-
-# Init Rx Timing at 300us (Frsky specific)
-timRx = pyb.Timer(2)
-timRx.init(freq=2778)
-timRx.callback(update_rx_data)
-
-# Init Timer for status led (1 sec interval)
-tim1 = pyb.Timer(1)
-tim1.init(freq=1)
-tim1.callback(status_led)
+# This will print received data 2 times per second
+channels = str(sbus.get_rx_channels())
+tim = Timer(-1)
+tim.init(freq=2, mode=Timer.PERIODIC, callback=lambda t:print(channels))
 
 while True:
-
-    if update_rx:
-        sbus.get_new_data()
-        update_rx = False
-
-    if updateLed:
-        # Print SBUS information every 1 sec
-        print(sbus.get_rx_channels())
-        updateLed = False
+    sbus.get_new_data()
+    channels = str(sbus.get_rx_channels())
+    led.toggle()
