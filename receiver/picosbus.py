@@ -18,14 +18,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from pyb import UART
+from machine import UART
+from machine import Pin
 import array
 
 
-class SBUSReceiver:
-    def __init__(self, uart_port):
-        self.sbus = UART(uart_port, 100000)
-        self.sbus.init(100000, bits=8, parity=0, stop=2, timeout_char=3, read_buf_len=250)
+class PicoSBUS:
+    def __init__(self, uart_num, rx_pin):
+        self.sbus = UART(uart_num, 100000)
+        self.sbus.init(100000, bits=8, parity=0, stop=2, rx=Pin(rx_pin), timeout_char=3, invert=UART.INV_RX)
 
         # constants
         self.START_BYTE = b'0f'
