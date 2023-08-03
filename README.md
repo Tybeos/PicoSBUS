@@ -1,4 +1,4 @@
-# sbus_driver_micropython
+# SBUS driver for Raspberry pi pico (RP2040)
 a Micropython driver for the SBUS protocol
 
 It supports 16 standard Channels plus 2 digitals.
